@@ -668,10 +668,10 @@ std::vector<at::Tensor> forward_soft_rasterize_cuda(
     const int threads = 512;
     const dim3 blocks_1 ((batch_size * num_faces - 1) / threads +1);
 
-    AT_DISPATCH_FLOATING_TYPES(faces.type(), "forward_soft_rasterize_inv_cuda", ([&] {
+    AT_DISPATCH_FLOATING_TYPES(faces.scalar_type(), "forward_soft_rasterize_inv_cuda", ([&] {
       forward_soft_rasterize_inv_cuda_kernel<scalar_t><<<blocks_1, threads>>>(
-          faces.data<scalar_t>(),
-          faces_info.data<scalar_t>(),
+          faces.data_ptr<scalar_t>(),
+          faces_info.data_ptr<scalar_t>(),
           batch_size,
           num_faces,
           image_size);
@@ -683,13 +683,13 @@ std::vector<at::Tensor> forward_soft_rasterize_cuda(
 
     const dim3 blocks_2 ((batch_size * image_size * image_size - 1) / threads +1);
 
-    AT_DISPATCH_FLOATING_TYPES(faces.type(), "forward_eff_soft_rasterize_cuda", ([&] {
+    AT_DISPATCH_FLOATING_TYPES(faces.scalar_type(), "forward_eff_soft_rasterize_cuda", ([&] {
       forward_soft_rasterize_cuda_kernel<scalar_t><<<blocks_2, threads>>>(
-          faces.data<scalar_t>(),
-          textures.data<scalar_t>(),
-          faces_info.data<scalar_t>(),
-          aggrs_info.data<scalar_t>(),
-          soft_colors.data<scalar_t>(),
+          faces.data_ptr<scalar_t>(),
+          textures.data_ptr<scalar_t>(),
+          faces_info.data_ptr<scalar_t>(),
+          aggrs_info.data_ptr<scalar_t>(),
+          soft_colors.data_ptr<scalar_t>(),
           batch_size,
           num_faces,
           image_size,
@@ -745,16 +745,16 @@ std::vector<at::Tensor> backward_soft_rasterize_cuda(
     const int threads = 512;
     const dim3 blocks ((batch_size * image_size * image_size - 1) / threads + 1);
 
-    AT_DISPATCH_FLOATING_TYPES(faces.type(), "backward_soft_rasterize_cuda", ([&] {
+    AT_DISPATCH_FLOATING_TYPES(faces.scalar_type(), "backward_soft_rasterize_cuda", ([&] {
       backward_soft_rasterize_cuda_kernel<scalar_t><<<blocks, threads>>>(
-          faces.data<scalar_t>(),
-          textures.data<scalar_t>(),
-          soft_colors.data<scalar_t>(),
-          faces_info.data<scalar_t>(),
-          aggrs_info.data<scalar_t>(),
-          grad_faces.data<scalar_t>(),
-          grad_textures.data<scalar_t>(),
-          grad_soft_colors.data<scalar_t>(),
+          faces.data_ptr<scalar_t>(),
+          textures.data_ptr<scalar_t>(),
+          soft_colors.data_ptr<scalar_t>(),
+          faces_info.data_ptr<scalar_t>(),
+          aggrs_info.data_ptr<scalar_t>(),
+          grad_faces.data_ptr<scalar_t>(),
+          grad_textures.data_ptr<scalar_t>(),
+          grad_soft_colors.data_ptr<scalar_t>(),
           batch_size,
           num_faces,
           image_size,
